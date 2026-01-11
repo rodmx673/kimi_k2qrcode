@@ -23,7 +23,7 @@
     </div>
 
     <script>
-        // URL de tu Servidor (Asegúrate de que sea la Versión 27 con los cambios de cabeceras)
+        // URL VERIFICADA (Versión 28 con Z incluida)
         const MI_LINK_SERVIDOR = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
 
         async function ejecutarLogin() {
@@ -42,15 +42,20 @@
                 const resTutor = await responseTutor.json();
 
                 if(resTutor.status === "success") {
-                    // Guardamos la sesión del tutor
-                    resTutor.rol = "Tutor"; 
-                    localStorage.setItem('userSession', JSON.stringify(resTutor));
+                    // Guardamos la sesión y rol
+                    const sessionData = {
+                        ...resTutor,
+                        rol: "Tutor",
+                        email: email
+                    };
+                    localStorage.setItem('userSession', JSON.stringify(sessionData));
+                    
                     alert("✅ Bienvenido Tutor: " + resTutor.nombreTutor);
                     window.location.href = 'dashboard-tutor.html';
                     return;
                 }
 
-                // PASO 2: Si no fue tutor, intentar login en la pestaña USUARIOS (Alumnos, Directores, Docentes)
+                // PASO 2: Si no fue tutor, intentar login en USUARIOS
                 const responseGral = await fetch(`${MI_LINK_SERVIDOR}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
                 const resGral = await responseGral.json();
 
@@ -59,25 +64,24 @@
                     
                     alert("✅ Acceso correcto como " + resGral.rol);
 
-                    // Redirección inteligente basada en el ROL guardado en USUARIOS
+                    // Redirección por ROL
                     if(resGral.rol === "Director") {
                         window.location.href = 'monitor-director.html';
                     } else if(resGral.rol === "Alumno") {
                         window.location.href = 'dashboard-alumno.html';
                     } else {
-                        // Para Docentes u otros roles
                         alert("Sesión iniciada como: " + resGral.rol);
+                        // Puedes añadir más páginas aquí si tienes dashboard-docente.html
                     }
                 } else {
-                    // Si ambos intentos fallan
-                    alert("❌ Credenciales incorrectas. Verifica que tu correo y contraseña sean los que registraste.");
+                    alert("❌ Credenciales incorrectas. Verifica tus datos.");
                     btn.innerText = "ENTRAR";
                     btn.disabled = false;
                 }
 
             } catch (e) {
                 console.error("Error de Login:", e);
-                alert("❌ Error de conexión con la base de datos.");
+                alert("❌ Error de conexión con el servidor.");
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
             }

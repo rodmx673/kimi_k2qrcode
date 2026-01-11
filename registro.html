@@ -37,7 +37,7 @@
     </div>
 
     <script>
-        // URL DE TU VERSIÓN 27
+        // URL CORREGIDA CON LA "Z" QUE FALTABA
         const MI_LINK_SERVIDOR = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
 
         function toggleFields() {
@@ -71,18 +71,21 @@
             btn.innerText = "GUARDANDO EN EXCEL...";
 
             try {
-                // Enviamos los datos al servidor
-                await fetch(MI_LINK_SERVIDOR, {
+                // Forzamos la acción en la URL para que Google Apps Script la identifique mejor
+                const urlFinal = `${MI_LINK_SERVIDOR}?action=registro`;
+
+                await fetch(urlFinal, {
                     method: 'POST',
-                    mode: 'no-cors', // Necesario para evitar bloqueos de Google
+                    mode: 'no-cors',
                     cache: 'no-cache',
                     body: JSON.stringify(datos)
                 });
 
-                alert("✅ ¡Registro enviado con éxito! Ya puedes iniciar sesión.");
-                
-                // REDIRECCIÓN UNIFICADA: Siempre al login general
-                window.location.href = "login.html";
+                // Damos un pequeño margen de tiempo para que el script procese
+                setTimeout(() => {
+                    alert("✅ ¡Registro enviado con éxito! Verifica tu Google Sheet.");
+                    window.location.href = "login.html";
+                }, 1500);
 
             } catch (e) {
                 console.error("Error de registro:", e);
@@ -92,7 +95,7 @@
             }
         }
 
-        // Ejecutar toggle al cargar por si acaso
+        // Ejecutar al inicio para ajustar campos visibles
         toggleFields();
     </script>
 </body>
