@@ -14,7 +14,7 @@
         
         <div id="registroForm">
             <label class="block mb-2 text-sm font-semibold text-gray-700">¿Quién eres?</label>
-            <select id="rol" class="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none transition" onchange="toggleDirectorField()">
+            <select id="rol" class="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none transition" onchange="toggleFields()">
                 <option value="Alumno">Alumno</option>
                 <option value="Tutor">Tutor / Padre</option>
                 <option value="Docente">Docente</option>
@@ -44,12 +44,17 @@
     <script>
         const MI_LINK_SERVIDOR = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
         
-        function toggleDirectorField() {
+        function toggleFields() {
             const rol = document.getElementById('rol').value;
             const divDir = document.getElementById('divDirectorID');
-            divDir.style.display = (rol === "Director") ? "none" : "block";
+            // Los Tutores y Directores no necesitan poner un ID de escuela al registrarse
+            if (rol === "Director" || rol === "Tutor") {
+                divDir.style.display = "none";
+            } else {
+                divDir.style.display = "block";
+            }
         }
-        toggleDirectorField();
+        toggleFields();
 
         async function registrar() {
             const btn = document.getElementById('btnRegistrar');
@@ -64,7 +69,8 @@
                 return;
             }
 
-            if(rol !== "Director" && !idDirector) {
+            // Validación de ID de escuela solo para alumnos, docentes y admin
+            if(rol !== "Director" && rol !== "Tutor" && !idDirector) {
                 alert("⚠️ Debes ingresar el ID de tu escuela para registrarte.");
                 return;
             }
@@ -72,37 +78,45 @@
             btn.disabled = true;
             btn.innerText = "Guardando en la nube...";
 
+            // Usamos URLSearchParams para enviar datos por POST
             const params = new URLSearchParams();
             params.append('action', 'registro');
             params.append('nombre', nombre);
             params.append('email', email);
             params.append('password', password);
             params.append('rol', rol);
-            params.append('idDirectorIngresado', idDirector);
+            params.append('idDirectorIngresado', (rol === "Tutor" || rol === "Director") ? "" : idDirector);
 
             try {
                 await fetch(MI_LINK_SERVIDOR, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: params.toString()
+                    body: params.toString(),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
                 });
 
+                // Simulación de espera para asegurar que Google reciba el dato
                 setTimeout(() => {
                     localStorage.setItem('userSession', JSON.stringify({
                         nombre: nombre,
                         email: email,
                         rol: rol,
-                        idEscuela: idDirector || "GENERANDO..."
+                        idEscuela: idDirector || "N/A"
                     }));
 
-                    alert("✅ ¡Registro enviado! Ahora puedes iniciar sesión.");
+                    alert("✅ ¡Registro enviado con éxito!");
 
+                    // Redirección inteligente
                     if (rol === "Director") {
                         window.location.href = 'monitor-director.html';
+                    } else if (rol === "Tutor") {
+                        window.location.href = 'dashboard-tutor.html';
                     } else {
-                        window.location.href = 'dashboard-alumno.html';
+                        window.location.href = 'login.html';
                     }
-                }, 1500);
+                }, 2000);
 
             } catch (error) {
                 console.error("Error en registro:", error);
