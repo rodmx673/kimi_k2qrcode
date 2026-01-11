@@ -6,73 +6,123 @@
     <title>Tutor Dashboard - QR Gate</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 min-h-screen font-sans">
+<body class="bg-slate-100 min-h-screen font-sans text-slate-900">
+
     <div id="loginSection" class="max-w-md mx-auto mt-20 p-6 bg-white rounded-3xl shadow-xl">
-        <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Acceso para Tutores</h2>
-        <input type="email" id="tutorEmail" placeholder="Correo electrónico" class="w-full p-4 mb-4 border rounded-xl">
-        <input type="password" id="tutorPass" placeholder="Contraseña" class="w-full p-4 mb-6 border rounded-xl">
-        <button onclick="loginTutor()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold">ENTRAR</button>
+        <h1 class="text-3xl font-black text-center text-blue-600 mb-2 italic">QR GATE</h1>
+        <h2 class="text-xl font-bold text-center mb-6 text-slate-800">Acceso para Tutores</h2>
+        <div class="space-y-4">
+            <input type="email" id="tutorEmail" placeholder="Correo electrónico" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+            <input type="password" id="tutorPass" placeholder="Contraseña" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+            <button onclick="loginTutor()" id="btnLogin" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition transform active:scale-95">ENTRAR</button>
+        </div>
     </div>
 
     <div id="dashboardSection" class="hidden max-w-4xl mx-auto p-4">
-        <header class="flex justify-between items-center mb-8">
-            <h1 class="text-xl font-black text-blue-900">QR GATE <span class="text-blue-500">TUTOR</span></h1>
-            <button onclick="location.reload()" class="text-red-500 font-bold text-sm">Cerrar Sesión</button>
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm">
+            <h1 class="text-xl font-black text-blue-900 uppercase">QR GATE <span class="text-blue-500 italic">TUTOR</span></h1>
+            <button onclick="location.reload()" class="bg-red-50 text-red-500 px-4 py-2 rounded-lg font-bold text-xs hover:bg-red-100 transition">Cerrar Sesión</button>
         </header>
 
+        <div class="bg-blue-600 p-6 rounded-3xl mb-8 shadow-blue-200 shadow-2xl text-white">
+            <h3 class="font-bold mb-2">Vincular nuevo alumno</h3>
+            <p class="text-blue-100 text-sm mb-4">Ingresa el ID del QR (email) de tu hijo para agregarlo a tu cuenta:</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="idNuevoHijo" placeholder="ejemplo@alumno.com" class="flex-grow p-3 rounded-xl text-slate-800 outline-none">
+                <button onclick="vincularHijo()" id="btnVincular" class="bg-yellow-400 text-blue-900 px-6 py-3 rounded-xl font-black hover:bg-yellow-300 transition shadow-md uppercase text-sm">Vincular</button>
+            </div>
+        </div>
+
         <div class="mb-6">
-            <p class="text-slate-500 text-sm mb-2 font-bold uppercase">Mis Hijos:</p>
-            <div id="botonesHijos" class="flex gap-2 overflow-x-auto pb-2">
+            <p class="text-slate-500 text-xs mb-3 font-black uppercase tracking-widest">Alumnos vinculados:</p>
+            <div id="botonesHijos" class="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
                 </div>
         </div>
 
-        <div id="perfilHijo" class="bg-white p-6 rounded-3xl shadow-lg mb-6 border-t-4 border-blue-500">
-            <h2 id="nombreHijoSel" class="text-2xl font-black text-slate-800 uppercase text-center">Seleccione un alumno</h2>
-            <p id="emailAvisoSel" class="text-center text-blue-600 text-sm"></p>
+        <div id="perfilHijo" class="bg-white p-8 rounded-3xl shadow-lg mb-6 border-t-8 border-blue-500 transition-all">
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <span class="text-3xl">👤</span>
+                </div>
+                <h2 id="nombreHijoSel" class="text-2xl font-black text-slate-800 uppercase text-center italic">Selecciona un alumno</h2>
+                <div class="mt-2 px-4 py-1 bg-blue-50 rounded-full">
+                    <p id="emailAvisoSel" class="text-center text-blue-600 text-xs font-bold"></p>
+                </div>
+            </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-lg overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
-                    <tr>
-                        <th class="p-4">Fecha</th>
-                        <th class="p-4">Hora</th>
-                        <th class="p-4">Estado</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaAsistencias"></tbody>
-            </table>
+        <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
+            <div class="p-4 border-b bg-slate-50">
+                <h4 class="font-bold text-slate-700">Historial Reciente</h4>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black">
+                        <tr>
+                            <th class="p-4">Fecha</th>
+                            <th class="p-4">Hora</th>
+                            <th class="p-4">Movimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAsistencias" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+            </div>
+            <div id="mensajeVacio" class="p-10 text-center text-slate-400 hidden">
+                No hay registros para este alumno todavía.
+            </div>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
         let hijosData = [];
+        let tutorEmailLogueado = "";
 
         async function loginTutor() {
-            const email = document.getElementById('tutorEmail').value;
-            const pass = document.getElementById('tutorPass').value;
-            
-            const resp = await fetch(`${API_URL}?action=loginTutor&email=${email}&password=${pass}`);
-            const data = await resp.json();
+            const email = document.getElementById('tutorEmail').value.trim();
+            const pass = document.getElementById('tutorPass').value.trim();
+            const btn = document.getElementById('btnLogin');
 
-            if (data.status === "success") {
-                hijosData = data.hijos;
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('dashboardSection').classList.remove('hidden');
-                renderizarBotones();
-            } else {
-                alert("Error: " + data.message);
+            if(!email || !pass) return alert("Por favor completa los campos.");
+            
+            btn.innerText = "Verificando...";
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch(`${API_URL}?action=loginTutor&email=${email}&password=${pass}`);
+                const data = await resp.json();
+
+                if (data.status === "success") {
+                    tutorEmailLogueado = email;
+                    hijosData = data.hijos;
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    renderizarBotones();
+                } else {
+                    alert("⚠️ " + data.message);
+                }
+            } catch (e) {
+                alert("Error de conexión al servidor.");
+            } finally {
+                btn.innerText = "ENTRAR";
+                btn.disabled = false;
             }
         }
 
         function renderizarBotones() {
             const contenedor = document.getElementById('botonesHijos');
             contenedor.innerHTML = "";
+            
+            if(hijosData.length === 0) {
+                contenedor.innerHTML = "<p class='text-slate-400 text-sm italic'>Aún no has vinculado a ningún hijo.</p>";
+                return;
+            }
+
             hijosData.forEach(hijo => {
                 const btn = document.createElement('button');
-                btn.innerText = hijo.nombre;
-                btn.className = "bg-white border-2 border-blue-200 px-6 py-3 rounded-full font-bold text-blue-600 shadow-sm hover:bg-blue-50 transition-all";
+                btn.innerHTML = `<span class="block text-[10px] opacity-60">ALUMNO</span> ${hijo.nombre}`;
+                btn.className = "bg-white border-2 border-slate-200 px-6 py-3 rounded-2xl font-black text-blue-900 shadow-sm hover:border-blue-500 hover:text-blue-600 transition-all whitespace-nowrap text-left min-w-[150px]";
                 btn.onclick = () => cargarDatosHijo(hijo);
                 contenedor.appendChild(btn);
             });
@@ -80,24 +130,70 @@
 
         async function cargarDatosHijo(hijo) {
             document.getElementById('nombreHijoSel').innerText = hijo.nombre;
-            document.getElementById('emailAvisoSel').innerText = "Enviando avisos a: " + hijo.emailAviso;
-            
-            const resp = await fetch(`${API_URL}?action=getHijoAsistencias&idHijo=${hijo.id}`);
-            const data = await resp.json();
+            document.getElementById('emailAvisoSel').innerText = "Avisos: " + hijo.emailAviso;
             
             const tabla = document.getElementById('tablaAsistencias');
-            tabla.innerHTML = data.asistencias.map(reg => `
-                <tr class="border-b">
-                    <td class="p-4 text-slate-600">${reg.fecha}</td>
-                    <td class="p-4 font-bold text-slate-800">${reg.hora}</td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-bold ${reg.tipo === 'Entrada' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">
-                            ${reg.tipo.toUpperCase()}
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
+            const msg = document.getElementById('mensajeVacio');
+            tabla.innerHTML = "<tr><td colspan='3' class='p-10 text-center text-blue-500 animate-pulse'>Cargando registros...</td></tr>";
+            
+            try {
+                const resp = await fetch(`${API_URL}?action=getHijoAsistencias&idHijo=${hijo.id}`);
+                const data = await resp.json();
+                
+                if(data.asistencias.length === 0) {
+                    tabla.innerHTML = "";
+                    msg.classList.remove('hidden');
+                } else {
+                    msg.classList.add('hidden');
+                    tabla.innerHTML = data.asistencias.map(reg => `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-4 text-slate-500 text-sm font-medium">${reg.fecha}</td>
+                            <td class="p-4 font-black text-slate-800">${reg.hora}</td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black tracking-tighter ${reg.tipo === 'Entrada' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">
+                                    ${reg.tipo.toUpperCase()}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) {
+                tabla.innerHTML = "<tr><td colspan='3' class='p-10 text-center text-red-500'>Error al cargar datos.</td></tr>";
+            }
+        }
+
+        async function vincularHijo() {
+            const idHijo = document.getElementById('idNuevoHijo').value.trim().toLowerCase();
+            const btn = document.getElementById('btnVincular');
+
+            if(!idHijo) return alert("Por favor ingresa el correo del alumno.");
+
+            btn.disabled = true;
+            btn.innerText = "VINCULANDO...";
+
+            try {
+                const resp = await fetch(`${API_URL}?action=vincularHijo&emailTutor=${tutorEmailLogueado}&idHijo=${idHijo}`);
+                const data = await resp.json();
+
+                if(data.status === "success") {
+                    alert("✅ ¡Hijo vinculado correctamente!");
+                    location.reload(); // Recargamos para actualizar la lista
+                } else {
+                    alert("❌ " + data.message);
+                }
+            } catch (e) {
+                alert("Error al vincular.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "VINCULAR";
+            }
         }
     </script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
 </body>
 </html>
