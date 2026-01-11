@@ -9,7 +9,7 @@
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md">
         <h1 class="text-3xl font-black text-center text-indigo-600 mb-2 italic uppercase">QR Gate Skool</h1>
-        <p class="text-slate-400 text-center mb-8 text-xs font-bold uppercase tracking-widest">Panel de Acceso</p>
+        <p class="text-slate-400 text-center mb-8 text-xs font-bold uppercase tracking-widest">Panel de Acceso Único</p>
         
         <div class="space-y-4">
             <input type="email" id="email" placeholder="Correo Electrónico" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition">
@@ -23,6 +23,7 @@
     </div>
 
     <script>
+        // URL de tu Servidor (Versión 26)
         const MI_LINK_SERVIDOR = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
 
         async function ejecutarLogin() {
@@ -36,19 +37,40 @@
             btn.disabled = true;
 
             try {
-                const response = await fetch(`${MI_LINK_SERVIDOR}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-                const res = await response.json();
+                // Primero intentamos login como Tutor (Acción loginTutor que busca en la pestaña TUTORES)
+                const responseTutor = await fetch(`${MI_LINK_SERVIDOR}?action=loginTutor&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                const resTutor = await responseTutor.json();
 
-                if(res.status === "success") {
-                    localStorage.setItem('userSession', JSON.stringify(res));
-                    window.location.href = (res.rol === "Director") ? 'monitor-director.html' : 'dashboard-alumno.html';
+                if(resTutor.status === "success") {
+                    // Si es tutor, guardamos sus datos y lo mandamos a su dashboard
+                    resTutor.rol = "Tutor"; // Forzamos el rol para la sesión
+                    localStorage.setItem('userSession', JSON.stringify(resTutor));
+                    window.location.href = 'dashboard-tutor.html';
+                    return;
+                }
+
+                // Si no fue tutor, intentamos el login general (Directores, Alumnos, etc.)
+                const responseGral = await fetch(`${MI_LINK_SERVIDOR}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                const resGral = await responseGral.json();
+
+                if(resGral.status === "success") {
+                    localStorage.setItem('userSession', JSON.stringify(resGral));
+                    
+                    // Redirección según rol
+                    if(resGral.rol === "Director") {
+                        window.location.href = 'monitor-director.html';
+                    } else {
+                        window.location.href = 'dashboard-alumno.html';
+                    }
                 } else {
-                    alert("Error: " + res.message);
+                    alert("Credenciales incorrectas. Verifica tu correo y contraseña.");
                     btn.innerText = "ENTRAR";
                     btn.disabled = false;
                 }
+
             } catch (e) {
-                alert("Error de conexión");
+                console.error(e);
+                alert("Error de conexión con el servidor");
                 btn.innerText = "ENTRAR";
                 btn.disabled = false;
             }

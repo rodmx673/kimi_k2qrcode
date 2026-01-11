@@ -3,87 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Gate Skool - Registro</title>
+    <title>QR Gate - Registro</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <h1 class="text-3xl font-extrabold text-center text-blue-600 mb-2 italic">QR GATE</h1>
-        <p class="text-gray-500 text-center mb-8">Crear Nueva Cuenta</p>
-        
-        <label class="block mb-2 text-sm font-semibold text-gray-700">¿Quién eres?</label>
-        <select id="rol" class="w-full p-3 border border-gray-300 rounded-lg mb-4 outline-none" onchange="toggleFields()">
-            <option value="Alumno">Alumno</option>
-            <option value="Tutor">Tutor / Padre</option>
-            <option value="Docente">Docente</option>
-            <option value="Administrativo">Administrativo</option>
-            <option value="Director">Director (Nueva Escuela)</option>
-        </select>
-
-        <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3 border border-gray-300 rounded-lg mb-4 outline-none text-slate-700">
-        <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3 border border-gray-300 rounded-lg mb-4 outline-none text-slate-700">
-        <input type="password" id="password" placeholder="Contraseña" class="w-full p-3 border border-gray-300 rounded-lg mb-4 outline-none text-slate-700">
-
-        <div id="divDirectorID">
-            <label class="block mb-2 text-sm font-semibold text-gray-700">ID de tu Escuela</label>
-            <input type="text" id="idDirector" placeholder="Ej: ESC-8660" class="w-full p-3 border border-gray-300 rounded-lg mb-4 uppercase font-mono">
+        <div id="registroForm">
+            <label class="block mb-2 text-sm font-semibold text-gray-700">¿Quién eres?</label>
+            <select id="rol" class="w-full p-3 border rounded-lg mb-4 outline-none" onchange="toggleFields()">
+                <option value="Alumno">Alumno</option>
+                <option value="Tutor / Padre">Tutor / Padre</option>
+                <option value="Docente">Docente</option>
+                <option value="Director">Director</option>
+            </select>
+            <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3 border rounded-lg mb-4 outline-none">
+            <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3 border rounded-lg mb-4 outline-none">
+            <input type="password" id="password" placeholder="Contraseña" class="w-full p-3 border rounded-lg mb-4 outline-none">
+            <div id="divDirectorID">
+                <input type="text" id="idDirector" placeholder="ID de Escuela (Ej: ESC-8660)" class="w-full p-3 border rounded-lg mb-4 uppercase">
+            </div>
+            <button onclick="registrar()" id="btnRegistrar" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition">Registrarse ahora</button>
         </div>
-
-        <button onclick="registrar()" id="btnRegistrar" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg mb-4">
-            Registrarse ahora
-        </button>
-
-        <p class="text-center text-sm text-gray-500">
-            ¿Ya tienes cuenta? <a href="login.html" class="text-blue-600 font-bold hover:underline">Inicia Sesión</a>
-        </p>
     </div>
 
     <script>
-        // USA TU URL DE LA NUEVA IMPLEMENTACIÓN (VERSIÓN 25)
         const MI_LINK_SERVIDOR = "https://script.google.com/macros/s/AKfycbxW2eTmjTj3UtOXJph2qi_-fMwE-A-8AT1EMt7a9achh1o7heNjXn8ZDhAOCJtDLrkP/exec";
-        
+
         function toggleFields() {
             const rol = document.getElementById('rol').value;
-            document.getElementById('divDirectorID').style.display = (rol === "Director" || rol === "Tutor") ? "none" : "block";
+            document.getElementById('divDirectorID').style.display = (rol === "Tutor / Padre" || rol === "Director") ? "none" : "block";
         }
-        toggleFields();
 
         async function registrar() {
             const btn = document.getElementById('btnRegistrar');
-            const rol = document.getElementById('rol').value;
-            const nombre = document.getElementById('nombre').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const idDirector = document.getElementById('idDirector').value.trim();
-            
-            if(!nombre || !email || !password) return alert("Llena los campos obligatorios.");
+            const datos = {
+                action: 'registro',
+                rol: document.getElementById('rol').value,
+                nombre: document.getElementById('nombre').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value.trim(),
+                idDirectorIngresado: document.getElementById('idDirector').value.trim()
+            };
+
+            if(!datos.nombre || !datos.email || !datos.password) return alert("Faltan datos");
 
             btn.disabled = true;
             btn.innerText = "Guardando...";
 
-            const datos = {
-                action: 'registro',
-                nombre: nombre,
-                email: email,
-                password: password,
-                rol: rol,
-                idDirectorIngresado: idDirector
-            };
-
             try {
-                // ENVIAR COMO JSON DIRECTO
                 await fetch(MI_LINK_SERVIDOR, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify(datos)
                 });
-
-                alert("✅ ¡Registro enviado! Revisa tu Excel.");
-                window.location.href = (rol === "Tutor") ? 'login-tutor.html' : 'login.html';
-            } catch (error) {
-                alert("Error de conexión.");
+                alert("✅ ¡Registro enviado con éxito!");
+                window.location.href = "login-tutor.html";
+            } catch (e) {
+                alert("Error");
                 btn.disabled = false;
-                btn.innerText = "Registrarse ahora";
             }
         }
     </script>
