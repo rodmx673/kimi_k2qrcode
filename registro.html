@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,7 @@
 
         <div class="space-y-3">
             <div>
-                <label class="block text-[10px] font-black text-slate-500 mb-1 ml-1 uppercase">¿Quién eres?</label>
+                <label class="block text-[10px] font-black text-slate-500 mb-1 ml-1 uppercase">Â¿QuiÃ©n eres?</label>
                 <select id="rol" onchange="toggleFields()" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
                     <option value="Alumno">Alumno</option>
                     <option value="Tutor">Tutor / Padre de Familia</option>
@@ -26,9 +26,9 @@
 
             <input type="text" id="nombre" placeholder="Nombre completo" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
             
-            <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
+            <input type="email" id="email" placeholder="Correo electrÃ³nico" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
             
-            <input type="password" id="password" placeholder="Contraseña" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
+            <input type="password" id="password" placeholder="ContraseÃ±a" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
             
             <div id="divDirectorID">
                 <input type="text" id="idDirector" placeholder="ID de Escuela (Ej: ESC-8660)" class="w-full p-3.5 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700 uppercase">
@@ -40,7 +40,7 @@
         </div>
 
         <div class="mt-6 text-center">
-            <p class="text-xs text-slate-500 font-medium">¿Ya tienes cuenta? <a href="login.html" class="text-blue-600 font-black hover:underline">Inicia sesión</a></p>
+            <p class="text-xs text-slate-500 font-medium">Â¿Ya tienes cuenta? <a href="login.html" class="text-blue-600 font-black hover:underline">Inicia sesiÃ³n</a></p>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
         /* ----------  CONFIG  ---------- */
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
 
-        /* ----------  UI DINÁMICA  ---------- */
+        /* ----------  UI DINÃMICA  ---------- */
         function toggleFields() {
             const rol = document.getElementById('rol').value;
             document.getElementById('divDirectorID').style.display = (rol === "Alumno") ? "block" : "none";
@@ -65,8 +65,8 @@
 
             /* Validaciones */
             if (!nombre || !email || !password) return alert("Completa todos los campos.");
-            if (!/^\S+@\S+\.\S+$/.test(email))   return alert("Correo inválido.");
-            if (password.length < 6)             return alert("Contraseña mínima 6 caracteres.");
+            if (!/^\S+@\S+\.\S+$/.test(email))   return alert("Correo invÃ¡lido.");
+            if (password.length < 6)             return alert("ContraseÃ±a mÃ­nima 6 caracteres.");
 
             btn.disabled = true;
             btn.innerText = "PROCESANDO...";
@@ -83,15 +83,15 @@
                 const data = await res.json();
 
                 if (data.status === "success") {
-                    alert("✅ Registro exitoso. Serás redirigido...");
+                    alert("âœ… Registro exitoso. SerÃ¡s redirigido...");
                     window.location.replace("login.html");
                 } else {
-                    alert("❌ " + (data.message || "Error al registrar"));
+                    alert("âŒ " + (data.message || "Error al registrar"));
                     resetBtn(btn);
                 }
             } catch (e) {
                 console.error(e);
-                alert("⚠️ No se pudo conectar con el servidor. Inténtalo de nuevo.");
+                alert("âš ï¸ No se pudo conectar con el servidor. IntÃ©ntalo de nuevo.");
                 resetBtn(btn);
             }
         }

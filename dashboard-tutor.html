@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
 <nav class="bg-blue-600 p-4 text-white shadow-lg">
     <div class="max-w-4xl mx-auto flex justify-between items-center">
         <h1 class="font-black italic uppercase tracking-tighter text-xl">QR Gate Skool</h1>
-        <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 transition">Cerrar Sesión</button>
+        <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 transition">Cerrar SesiÃ³n</button>
     </div>
 </nav>
 
@@ -51,10 +51,10 @@
 <div id="modalVinculo" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
         <h3 class="text-xl font-bold text-slate-800 mb-2">Vincular Alumno</h3>
-        <p class="text-slate-500 text-sm mb-6">Ingresa el correo o ID que aparece debajo del QR del alumno.</p>
+        <p class="text-slate-500 text-sm mb-6">Ingresa el correo electrÃ³nico del alumno.</p>
 
         <input type="text" id="alumnoID" placeholder="Ej: alumno@correo.com"
-               class="w-full p-4 bg-slate-100 border-none rounded-2xl mb-4 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-center text-lg uppercase">
+               class="w-full p-4 bg-slate-100 border-none rounded-2xl mb-4 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-center text-lg">
 
         <div class="flex gap-3">
             <button onclick="cerrarModal()" class="flex-1 py-3 text-slate-400 font-bold hover:bg-slate-50 rounded-2xl transition">Cancelar</button>
@@ -64,22 +64,22 @@
 </div>
 
 <script>
-    /* ----------  CONFIG  ---------- */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
 
-    /* ----------  INICIO  ---------- */
     window.onload = () => {
         const session = JSON.parse(localStorage.getItem('userSession'));
-        if (!session) { window.location.replace('login.html'); return; }
+        if (!session || session.rol !== 'Tutor') {
+            alert("Acceso denegado. Debes ser Tutor.");
+            window.location.replace('login.html');
+            return;
+        }
         document.getElementById('nombreTutor').textContent = session.nombre;
         cargarAsistencias(session.email);
     };
 
-    /* ----------  CARGAR TABLA  ---------- */
     async function cargarAsistencias(email) {
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getHijosInfo&email=${encodeURIComponent(email)}`, {method:'GET',mode:'cors'});
-            if (!res.ok) throw new Error('Respuesta no ok');
             const data = await res.json();
             const tbody = document.getElementById('tablaHijos');
             tbody.innerHTML = '';
@@ -90,53 +90,47 @@
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50';
                     tr.innerHTML = `
-                        <td class="p-4 font-bold text-slate-700 text-sm"></td>
-                        <td class="p-4 font-black ${color} text-xs"></td>
-                        <td class="p-4 text-slate-400 font-mono text-[10px]"></td>`;
-                    tr.cells[0].textContent = reg.nombreHijo;
-                    tr.cells[1].textContent = reg.tipo.toUpperCase();
-                    tr.cells[2].textContent = reg.hora;
+                        <td class="p-4 font-bold text-slate-700 text-sm">${reg.nombreHijo}</td>
+                        <td class="p-4 font-black ${color} text-xs">${reg.tipo.toUpperCase()}</td>
+                        <td class="p-4 text-slate-400 font-mono text-[10px]">${reg.hora}</td>`;
                     tbody.appendChild(tr);
                 });
             } else {
                 tbody.innerHTML = `<tr><td colspan="3" class="p-10 text-center text-slate-400 italic">No hay alumnos vinculados o no hay actividad hoy.</td></tr>`;
             }
         } catch (e) {
-            console.error('Error cargando asistencias:', e);
+            console.error('Error:', e);
             document.getElementById('tablaHijos').innerHTML =
-                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexión.</td></tr>`;
+                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexiÃ³n.</td></tr>`;
         }
     }
 
-    /* ----------  MODAL  ---------- */
     function mostrarModal() { document.getElementById('modalVinculo').classList.remove('hidden'); }
     function cerrarModal()  { document.getElementById('modalVinculo').classList.add('hidden'); }
 
     async function procesarVinculo() {
-        const idAlum = document.getElementById('alumnoID').value.trim();
+        const idAlum = document.getElementById('alumnoID').value.trim().toLowerCase();
         const session = JSON.parse(localStorage.getItem('userSession'));
-        if (!idAlum) return alert("Escribe el ID del alumno");
+        if (!idAlum) return alert("Escribe el correo del alumno");
 
         try {
             const res = await fetch(`${SCRIPT_URL}?action=vincularAlumno&id=${encodeURIComponent(idAlum)}&tutorEmail=${encodeURIComponent(session.email)}`, {method:'GET',mode:'cors'});
-            if (!res.ok) throw new Error('Respuesta no ok');
             const data = await res.json();
 
             if (data.status === 'success') {
-                alert('¡Vinculación exitosa!');
+                alert('Â¡VinculaciÃ³n exitosa!');
                 cerrarModal();
                 document.getElementById('alumnoID').value = '';
                 cargarAsistencias(session.email);
             } else {
-                alert('Error: ' + data.message);
+                alert('Error: ' + (data.message || 'No se pudo vincular'));
             }
         } catch (error) {
-            console.error('Error en vinculación:', error);
+            console.error('Error:', error);
             alert('Hubo un problema al conectar con el servidor.');
         }
     }
 
-    /* ----------  LOGOUT  ---------- */
     function logout() {
         localStorage.removeItem('userSession');
         window.location.replace('login.html');

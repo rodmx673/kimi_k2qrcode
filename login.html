@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -22,10 +22,10 @@
                     placeholder="tu@email.com">
             </div>
             <div>
-                <label class="block text-xs font-black text-slate-500 mb-1 ml-1">CONTRASEÑA</label>
+                <label class="block text-xs font-black text-slate-500 mb-1 ml-1">CONTRASEÃ‘A</label>
                 <input type="password" id="password" required
                     class="w-full p-4 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700"
-                    placeholder="••••••••">
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
             </div>
 
             <button type="submit" id="btnIngresar"
@@ -35,7 +35,7 @@
         </form>
 
         <div class="mt-6 text-center">
-            <a href="index.html" class="text-slate-400 text-xs font-bold hover:text-blue-600">← Volver al inicio</a>
+            <a href="index.html" class="text-slate-400 text-xs font-bold hover:text-blue-600">â† Volver al inicio</a>
         </div>
     </div>
 
@@ -70,12 +70,12 @@
                     if (dest) window.location.replace(dest);
                     else      throw new Error("Rol desconocido");
                 } else {
-                    alert("❌ " + (data.message || "Credenciales incorrectas"));
+                    alert("âŒ " + (data.message || "Credenciales incorrectas"));
                     resetBtn(btn);
                 }
             } catch (err) {
                 console.error(err);
-                alert("⚠️ Error de conexión. Revisa tu internet o que el servidor esté activo.");
+                alert("âš ï¸ Error de conexiÃ³n. Revisa tu internet o que el servidor estÃ© activo.");
                 resetBtn(btn);
             }
 

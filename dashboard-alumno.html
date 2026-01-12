@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +19,7 @@
 
 <main class="max-w-md mx-auto p-6 flex flex-col items-center">
     <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">¡Hola, <span id="nombreAlumno">...</span>!</h2>
+        <h2 class="text-2xl font-bold text-slate-800">Â¡Hola, <span id="nombreAlumno">...</span>!</h2>
         <p class="text-slate-500 text-sm">Esta es tu credencial digital de acceso.</p>
     </div>
 
@@ -38,15 +38,15 @@
         </div>
 
         <div class="bg-slate-50 p-4 text-center border-t border-slate-100">
-            <p class="text-[11px] text-slate-400 font-bold italic">Presenta este código al ingresar a la institución</p>
+            <p class="text-[11px] text-slate-400 font-bold italic">Presenta este cÃ³digo al ingresar a la instituciÃ³n</p>
         </div>
     </div>
 
     <div class="w-full mt-8 space-y-3">
         <button onclick="descargarCredencial()" class="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-emerald-600 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-            <span>📥</span> GUARDAR CREDENCIAL
+            <span>ðŸ“¥</span> GUARDAR CREDENCIAL
         </button>
-        <p class="text-center text-[11px] text-slate-400 font-medium">La imagen se guardará en tu galería de fotos.</p>
+        <p class="text-center text-[11px] text-slate-400 font-medium">La imagen se guardarÃ¡ en tu galerÃ­a de fotos.</p>
     </div>
 </main>
 
@@ -109,7 +109,7 @@
 
     /* ----------  LOGOUT  ---------- */
     function logout() {
-        if (confirm('¿Cerrar sesión?')) {
+        if (confirm('Â¿Cerrar sesiÃ³n?')) {
             localStorage.removeItem('userSession');
             window.location.replace('login.html');
         }

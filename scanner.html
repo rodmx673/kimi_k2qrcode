@@ -1,138 +1,129 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner Pro - QR Gate</title>
+    <title>EscÃ¡ner QR - QR Gate</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        .scan-success { border: 10px solid #22c55e !important; box-shadow: 0 0 30px #22c55e; }
-        .scan-error { border: 10px solid #ef4444 !important; box-shadow: 0 0 30px #ef4444; }
-        #reader video { border-radius: 20px; object-fit: cover; }
+        #reader { width: 100%; max-width: 500px; margin: 0 auto; }
+        .escaneando { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
     </style>
 </head>
-<body class="bg-slate-900 min-h-screen text-white p-4 font-sans">
-    <div class="max-w-md mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-blue-400 italic">QR Gate Skool</h1>
-            <p class="text-slate-400 text-sm">Control de Acceso V30</p>
-        </header>
+<body class="bg-slate-900 min-h-screen flex flex-col items-center justify-center p-4 text-white">
 
-        <div id="wrapper" class="bg-white rounded-3xl overflow-hidden mb-6 border-4 border-slate-700 transition-all duration-300">
-            <div id="reader" class="w-full"></div>
-        </div>
+<div class="text-center mb-8">
+    <h1 class="text-3xl font-black text-blue-400 italic">QR GATE SKOOL</h1>
+    <p class="text-slate-400 mt-2">Escanea la credencial para registrar acceso</p>
+</div>
 
-        <div id="resultado" class="hidden p-6 rounded-2xl text-center mb-6 transition-all duration-300 scale-105">
-            <p id="msgStatus" class="text-xs uppercase font-black tracking-widest mb-1"></p>
-            <p id="nombreEscaneado" class="text-2xl font-black uppercase">...</p>
-            <div id="iconoGrande" class="text-5xl mt-2"></div>
-        </div>
+<div id="reader" class="rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-500 escaneando"></div>
 
-        <button id="btnEncender" onclick="iniciarCamaraManual()"
-                class="w-full bg-blue-600 hover:bg-blue-500 text-white px-6 py-4 rounded-full font-black text-lg shadow-lg transition transform active:scale-95">
-            🚀 ENCENDER CÁMARA
-        </button>
+<div id="resultado" class="mt-8 text-center max-w-md mx-auto hidden">
+    <div id="mensaje" class="text-xl font-bold mb-4"></div>
+    <button onclick="reiniciarEscaneo()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-6 rounded-2xl transition">
+        ESCANEAR OTRO
+    </button>
+</div>
 
-        <div class="text-center mt-6">
-            <a href="dashboard-director.html" class="text-slate-500 text-xs hover:text-white underline">Volver al Dashboard</a>
-        </div>
-    </div>
+<a href="index.html" class="absolute top-4 left-4 bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-full">
+    â†
+</a>
 
-    <script>
-        /* ----------  CONFIG  ---------- */
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
 
-        const html5QrCode = new Html5Qrcode("reader");
-        let isScanning = false;
-        let audioCtx;
+    let html5QrCode = null;
 
-        /* ----------  AUDIO FEEDBACK  ---------- */
-        function playSound(freq, duration, type) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc  = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                osc.start();
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) { console.warn('Audio no disponible'); }
+    function onScanSuccess(decodedText, decodedResult) {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                procesarQR(decodedText.trim());
+            }).catch(err => console.warn("Error al detener:", err));
+        }
+    }
+
+    function onScanFailure(error) {
+        // Silencioso: no mostrar errores de escaneo fallido
+    }
+
+    async function procesarQR(email) {
+        if (!email || !email.includes('@')) {
+            mostrarResultado("âŒ CÃ³digo invÃ¡lido", "red");
+            return;
         }
 
-        /* ----------  CAMARA  ---------- */
-        async function iniciarCamaraManual() {
-            const btn = document.getElementById('btnEncender');
-            btn.innerText = 'INICIANDO...';
-            try {
-                await html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 20, qrbox: { width: 250, height: 250 } },
-                    onScanSuccess
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'scan', email: email })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const color = data.tipo === 'Entrada' ? 'text-emerald-400' : 'text-orange-400';
+                const icon = data.tipo === 'Entrada' ? 'âœ…' : 'ðŸšª';
+                mostrarResultado(
+                    `${icon} ${data.tipo.toUpperCase()}<br><span class="text-lg">${data.nombre}</span>`,
+                    data.tipo === 'Entrada' ? 'emerald' : 'orange'
                 );
-                btn.classList.add('hidden');
-                isScanning = true;
-            } catch (err) {
-                btn.innerText = 'ERROR DE CÁMARA';
-                console.error(err);
-                alert('Asegúrate de dar permisos de cámara.');
+            } else {
+                mostrarResultado("âŒ Error: " + (data.message || "No se pudo registrar"), "red");
             }
+        } catch (err) {
+            console.error("Error en escaneo:", err);
+            mostrarResultado("âš ï¸ Error de conexiÃ³n", "yellow");
         }
+    }
 
-        /* ----------  LECTURA + BACKEND  ---------- */
-        async function onScanSuccess(decodedText) {
-            if (!isScanning) return;
-            isScanning = false;
+    function mostrarResultado(mensaje, color) {
+        const resultado = document.getElementById('resultado');
+        const mensajeDiv = document.getElementById('mensaje');
+        
+        mensajeDiv.innerHTML = mensaje;
+        mensajeDiv.className = `text-xl font-bold mb-4 text-${color}-400`;
+        resultado.classList.remove('hidden');
+    }
 
-            const wrapper   = document.getElementById('wrapper');
-            const panel     = document.getElementById('resultado');
-            const txtStatus = document.getElementById('msgStatus');
-            const txtNombre = document.getElementById('nombreEscaneado');
-            const icono     = document.getElementById('iconoGrande');
+    function reiniciarEscaneo() {
+        document.getElementById('resultado').classList.add('hidden');
+        iniciarEscaneo();
+    }
 
-            panel.className = 'bg-blue-600 p-6 rounded-2xl text-center mb-6 block animate-pulse';
-            txtStatus.innerText = 'VERIFICANDO...';
-            txtNombre.innerText = 'CONECTANDO...';
-            icono.innerText = '⏳';
+    function iniciarEscaneo() {
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            config,
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            console.error("No se pudo iniciar la cÃ¡mara:", err);
+            document.getElementById('reader').innerHTML = 
+                `<div class="p-8 bg-slate-800 text-red-400">âš ï¸ No se pudo acceder a la cÃ¡mara.<br>Permite el uso de la cÃ¡mara e intenta de nuevo.</div>`;
+        });
+    }
 
-            const emailLimpio = decodedText.trim().toLowerCase();
-            const urlFinal    = `${SCRIPT_URL}?action=scan&email=${encodeURIComponent(emailLimpio)}`;
-
-            try {
-                const res = await fetch(urlFinal, { method: 'GET', mode: 'cors' });
-                if (!res.ok) throw new Error('Respuesta no ok');
-                const data = await res.json();
-
-                if (data.status === 'success') {
-                    playSound(880, 0.2, 'sine');
-                    wrapper.classList.add('scan-success');
-                    panel.className  = 'bg-green-500 p-6 rounded-2xl text-center mb-6 block';
-                    txtStatus.innerText = `¡${data.tipo.toUpperCase()} REGISTRADA!`;
-                    txtNombre.innerText = data.nombre || 'Usuario';
-                    icono.innerText = '✅';
-                } else {
-                    throw new Error(data.message);
-                }
-            } catch (err) {
-                console.error('Error de escaneo:', err);
-                playSound(150, 0.4, 'sawtooth');
-                wrapper.classList.add('scan-error');
-                panel.className  = 'bg-red-600 p-6 rounded-2xl text-center mb-6 block';
-                txtStatus.innerText = 'ACCESO DENEGADO';
-                txtNombre.innerText = 'NO ENCONTRADO';
-                icono.innerText = '❌';
-            } finally {
-                setTimeout(() => {
-                    panel.className = 'hidden';
-                    wrapper.classList.remove('scan-success', 'scan-error');
-                    isScanning = true;
-                }, 3000);
-            }
+    // Iniciar al cargar
+    window.onload = () => {
+        const session = localStorage.getItem('userSession');
+        if (!session) {
+            alert("Debes iniciar sesiÃ³n primero.");
+            window.location.replace('login.html');
+            return;
         }
-    </script>
+        iniciarEscaneo();
+    };
+</script>
 </body>
 </html>

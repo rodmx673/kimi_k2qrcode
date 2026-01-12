@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor del Director – QR Gate</title>
+    <title>Monitor del Director â€“ QR Gate</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -17,7 +17,7 @@
     <div class="flex items-center gap-4">
         <a href="scanner.html"
            class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md transition transform active:scale-95">
-            📷 ABRIR ESCÁNER
+            ðŸ“· ABRIR ESCÃNER
         </a>
         <div class="text-right">
             <p id="nombreDirector" class="text-[10px] font-bold opacity-80 uppercase leading-none mb-1">Cargando...</p>
@@ -44,7 +44,7 @@
 
     <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100">
         <div class="p-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-            <h2 class="font-black text-slate-800 uppercase text-sm italic">Últimos Movimientos en Vivo</h2>
+            <h2 class="font-black text-slate-800 uppercase text-sm italic">Ãšltimos Movimientos en Vivo</h2>
             <span class="text-[10px] bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold">MONITOR ACTIVO</span>
         </div>
         <div class="overflow-x-auto">
@@ -70,7 +70,7 @@
     /* ----------  CONFIG  ---------- */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
 
-    /* ----------  SEGURIDAD / SESIÓN  ---------- */
+    /* ----------  SEGURIDAD / SESIÃ“N  ---------- */
     const session = JSON.parse(localStorage.getItem('userSession'));
     if (!session) { window.location.replace('login.html'); }
 
@@ -80,7 +80,7 @@
     document.getElementById('idEscuela').textContent      = session.idEscuela || '---';
     actualizarMonitor();
 
-    /* ----------  RELOJ + CUENTA ATRÁS (único intervalo)  ---------- */
+    /* ----------  RELOJ + CUENTA ATRÃS (Ãºnico intervalo)  ---------- */
     setInterval(() => {
         document.getElementById('reloj').textContent = new Date().toLocaleTimeString();
         countdown--;
@@ -133,7 +133,7 @@
         } catch (e) {
             console.error('Error monitor:', e);
             document.getElementById('listaLogs').innerHTML =
-                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexión. Intenta refrescar.</td></tr>`;
+                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexiÃ³n. Intenta refrescar.</td></tr>`;
         }
     }
 </script>
