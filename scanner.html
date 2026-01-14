@@ -154,55 +154,100 @@ async function procesarQR(email) {
     }
     
     try {
-        debugLog(`🔄 Enviando a API: ${SCRIPT_URL}`);
+        debugLog(`🔄 Enviando SCAN vía GET...`);
         
-        const requestData = {
-            action: 'scan',
-            email: email,
-            _timestamp: Date.now()
-        };
+        // USAR GET en lugar de POST (para evitar CORS)
+        const url = `${SCRIPT_URL}?action=scan&email=${encodeURIComponent(email)}&timestamp=${Date.now()}`;
+        debugLog(`📤 URL: ${url}`);
         
-        debugLog(`📤 Request: ${JSON.stringify(requestData)}`);
-        
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
+        const res = await fetch(url, {
+            method: 'GET',
             mode: 'cors',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(requestData)
+            cache: 'no-cache'
         });
         
         debugLog(`📥 Response status: ${res.status} ${res.statusText}`);
         
-        // Leer respuesta como texto primero
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errorText}`);
+        }
+        
         const responseText = await res.text();
-        debugLog(`📦 Response body: ${responseText.substring(0, 200)}...`);
+        debugLog(`📦 Response body: ${responseText.substring(0, 150)}...`);
         
         let data;
         try {
             data = JSON.parse(responseText);
         } catch (jsonError) {
             debugLog(`❌ Error parseando JSON: ${jsonError.message}`, 'error');
-            debugLog(`Respuesta cruda: ${responseText}`, 'error');
             mostrarResultado("❌ Error en respuesta del servidor", "red");
             return;
         }
         
         if (data.status === 'success') {
             debugLog(`✅ Registro exitoso: ${data.tipo} - ${data.nombre}`, 'success');
-            const color = data.tipo === 'Entrada' ? 'emerald' : 'orange';
-            mostrarResultado(`${data.tipo === 'Entrada' ? '✅' : '🚪'} ${data.tipo.toUpperCase()}<br><span class="text-lg">${data.nombre}</span>`, color);
+            
+            const icono = data.tipo === 'Entrada' ? '✅' : '🚪';
+            const colorClass = data.tipo === 'Entrada' ? 'text-emerald-400' : 'text-orange-400';
+            const bgClass = data.tipo === 'Entrada' ? 'bg-emerald-900/20' : 'bg-orange-900/20';
+            
+            mostrarResultado(
+                `<div class="${bgClass} p-6 rounded-2xl border-2 ${colorClass.replace('text', 'border')}">
+                    <div class="text-5xl mb-3">${icono}</div>
+                    <div class="text-2xl font-bold ${colorClass} mb-1">${data.tipo.toUpperCase()}</div>
+                    <div class="text-xl font-semibold text-white mb-2">${data.nombre}</div>
+                    <div class="text-sm text-slate-300">${data.email}</div>
+                    <div class="text-xs text-slate-400 mt-2">${data.hora} • ${data.fecha}</div>
+                    <div class="text-xs text-slate-500 mt-3">${data.message}</div>
+                </div>`,
+                data.tipo === 'Entrada' ? 'emerald' : 'orange'
+            );
+            
+            // Auto-reiniciar después de 3 segundos
+            setTimeout(reiniciarEscaneo, 3000);
+            
         } else {
             debugLog(`❌ Error API: ${data.message || "Desconocido"}`, 'error');
-            mostrarResultado("❌ Error: " + (data.message || "No se pudo registrar"), "red");
+            mostrarResultado(
+                `<div class="bg-red-900/20 p-6 rounded-2xl border-2 border-red-400">
+                    <div class="text-4xl mb-3">❌</div>
+                    <div class="text-xl font-bold text-red-400">ERROR</div>
+                    <div class="text-white mt-2">${data.message || "No se pudo registrar"}</div>
+                </div>`,
+                "red"
+            );
+            setTimeout(reiniciarEscaneo, 3000);
         }
         
     } catch (err) {
         debugLog(`💥 Error de conexión: ${err.message}`, 'error');
         console.error('Error completo:', err);
-        mostrarResultado("⚠️ Error de conexión", "yellow");
+        
+        // Mensaje amigable según el tipo de error
+        if (err.message.includes('Failed to fetch') || err.message.includes('CORS')) {
+            mostrarResultado(
+                `<div class="bg-yellow-900/20 p-6 rounded-2xl border-2 border-yellow-400">
+                    <div class="text-4xl mb-3">🌐</div>
+                    <div class="text-xl font-bold text-yellow-400">ERROR DE CONEXIÓN</div>
+                    <div class="text-white mt-2">Problema de CORS con la API</div>
+                    <div class="text-sm text-yellow-300 mt-3">Intenta escanear nuevamente</div>
+                </div>`,
+                "yellow"
+            );
+        } else {
+            mostrarResultado(
+                `<div class="bg-yellow-900/20 p-6 rounded-2xl border-2 border-yellow-400">
+                    <div class="text-4xl mb-3">⚠️</div>
+                    <div class="text-xl font-bold text-yellow-400">ERROR DE CONEXIÓN</div>
+                    <div class="text-white mt-2">${err.message || "Error desconocido"}</div>
+                    <div class="text-sm text-yellow-300 mt-3">Intenta nuevamente</div>
+                </div>`,
+                "yellow"
+            );
+        }
+        
+        setTimeout(reiniciarEscaneo, 3000);
     }
 }
 
