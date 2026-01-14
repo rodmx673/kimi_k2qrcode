@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido - QR Gate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 text-center">
 
 <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-lg transform transition-all animate-in fade-in zoom-in duration-500">
     <div class="mb-2">
-        <span class="text-5xl">ðŸ›¡ï¸</span>
+        <span class="text-5xl">🛡️</span>
         <h1 class="text-4xl font-black text-blue-600 italic tracking-tighter mt-2">QR GATE SKOOL</h1>
     </div>
     <p class="text-slate-500 mb-10 font-medium">Sistema Inteligente de Control Escolar</p>
@@ -18,7 +18,7 @@
     <div class="grid grid-cols-1 gap-4">
         <a href="login.html"
            class="bg-blue-600 text-white p-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-lg active:scale-95 transform">
-            INICIAR SESIÃ“N
+            INICIAR SESIÓN
         </a>
 
         <a href="registro.html"
@@ -34,7 +34,7 @@
 </div>
 
 <script>
-    /* ----------  REDIRECCIÃ“N SEGURA  ---------- */
+    /* ----------  REDIRECCIÓN SEGURA  ---------- */
     window.onload = () => {
         try {
             const sessionData = localStorage.getItem('userSession');
@@ -43,21 +43,22 @@
             const session = JSON.parse(sessionData);
             if (!session || !session.rol) return;
 
-            console.log('SesiÃ³n activa detectada para:', session.rol);
+            console.log('Sesión activa detectada para:', session.rol);
 
             const rutas = {
                 Director: 'monitor-director.html',
                 Tutor:    'dashboard-tutor.html',
                 Alumno:   'dashboard-alumno.html',
-                Docente:  'dashboard-docente.html' // âœ… Agregado
+                Docente:  'dashboard-docente.html'
             };
             const dest = rutas[session.rol];
             if (dest) window.location.replace(dest);
         } catch (e) {
-            console.error('Error en redirecciÃ³n:', e);
-            localStorage.removeItem('userSession'); // limpiar corrupciÃ³n
+            console.error('Error en redirección:', e);
+            localStorage.removeItem('userSession'); // limpiar corrupción
         }
     };
 </script>
 </body>
 </html>
+

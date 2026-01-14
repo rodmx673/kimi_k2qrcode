@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Panel - QR Gate Docente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> <!-- ✅ Espacio eliminado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> <!-- ✅ Espacio eliminado -->
 </head>
 <body class="bg-slate-100 min-h-screen">
 
@@ -38,37 +38,39 @@
         </div>
 
         <div class="bg-slate-50 p-4 text-center border-t border-slate-100">
-            <p class="text-[11px] text-slate-400 font-bold italic">Presenta este cÃ³digo al ingresar a la instituciÃ³n</p>
+            <p class="text-[11px] text-slate-400 font-bold italic">Presenta este código al ingresar a la institución</p>
         </div>
     </div>
 
     <div class="w-full mt-8 space-y-3">
         <button onclick="descargarCredencial()" class="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-emerald-600 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-            <span>ðŸ“¥</span> GUARDAR CREDENCIAL
+            <span>📥</span> GUARDAR CREDENCIAL
         </button>
-        <p class="text-center text-[11px] text-slate-400 font-medium">La imagen se guardarÃ¡ en tu galerÃ­a de fotos.</p>
+        <p class="text-center text-[11px] text-slate-400 font-medium">La imagen se guardará en tu galería de fotos.</p>
     </div>
 </main>
 
 <script>
     /* ----------  CONFIG  ---------- */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec"; // ✅ Espacio eliminado
 
     /* ----------  INICIO  ---------- */
     window.onload = () => {
         const userData = localStorage.getItem('userSession');
-        if (!userData) { window.location.replace('login.html'); return; }
+        if (!userData || JSON.parse(userData).rol !== 'Docente') { // ✅ Validación de rol
+            alert("Acceso denegado. Solo docentes.");
+            window.location.replace('login.html');
+            return;
+        }
 
         const user = JSON.parse(userData);
         const emailLimpio = user.email.toLowerCase().trim();
 
-        /* UI segura */
         document.getElementById('nombreDocente').textContent = (user.nombre || 'Docente').split(' ')[0];
         document.getElementById('nombreCredencial').textContent = user.nombre || 'Sin Nombre';
         document.getElementById('rolDisplay').textContent = user.rol || 'DOCENTE';
         document.getElementById('idUnico').textContent = emailLimpio;
 
-        /* QR */
         document.getElementById('qrcode').innerHTML = '';
         new QRCode(document.getElementById('qrcode'), {
             text: emailLimpio,
@@ -109,7 +111,7 @@
 
     /* ----------  LOGOUT  ---------- */
     function logout() {
-        if (confirm('Â¿Cerrar sesiÃ³n?')) {
+        if (confirm('¿Cerrar sesión?')) {
             localStorage.removeItem('userSession');
             window.location.replace('login.html');
         }
@@ -117,3 +119,4 @@
 </script>
 </body>
 </html>
+

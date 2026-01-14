@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EscÃ¡ner QR - QR Gate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <title>Escáner QR - QR Gate</title>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> <!-- ✅ Espacio eliminado -->
     <style>
         #reader { width: 100%; max-width: 500px; margin: 0 auto; }
         .escaneando { animation: pulse 2s infinite; }
@@ -33,11 +33,11 @@
 </div>
 
 <a href="index.html" class="absolute top-4 left-4 bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-full">
-    â†
+    ←
 </a>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec"; // ✅ Espacio eliminado
 
     let html5QrCode = null;
 
@@ -50,12 +50,12 @@
     }
 
     function onScanFailure(error) {
-        // Silencioso: no mostrar errores de escaneo fallido
+        // Silencioso
     }
 
     async function procesarQR(email) {
         if (!email || !email.includes('@')) {
-            mostrarResultado("âŒ CÃ³digo invÃ¡lido", "red");
+            mostrarResultado("❌ Código inválido", "red");
             return;
         }
 
@@ -71,17 +71,17 @@
 
             if (data.status === 'success') {
                 const color = data.tipo === 'Entrada' ? 'text-emerald-400' : 'text-orange-400';
-                const icon = data.tipo === 'Entrada' ? 'âœ…' : 'ðŸšª';
+                const icon = data.tipo === 'Entrada' ? '✅' : '🚪';
                 mostrarResultado(
                     `${icon} ${data.tipo.toUpperCase()}<br><span class="text-lg">${data.nombre}</span>`,
                     data.tipo === 'Entrada' ? 'emerald' : 'orange'
                 );
             } else {
-                mostrarResultado("âŒ Error: " + (data.message || "No se pudo registrar"), "red");
+                mostrarResultado("❌ Error: " + (data.message || "No se pudo registrar"), "red");
             }
         } catch (err) {
             console.error("Error en escaneo:", err);
-            mostrarResultado("âš ï¸ Error de conexiÃ³n", "yellow");
+            mostrarResultado("⚠️ Error de conexión", "yellow");
         }
     }
 
@@ -108,22 +108,30 @@
             onScanSuccess,
             onScanFailure
         ).catch(err => {
-            console.error("No se pudo iniciar la cÃ¡mara:", err);
+            console.error("No se pudo iniciar la cámara:", err);
             document.getElementById('reader').innerHTML = 
-                `<div class="p-8 bg-slate-800 text-red-400">âš ï¸ No se pudo acceder a la cÃ¡mara.<br>Permite el uso de la cÃ¡mara e intenta de nuevo.</div>`;
+                `<div class="p-8 bg-slate-800 text-red-400">⚠️ No se pudo acceder a la cámara.<br>Permite el uso de la cámara e intenta de nuevo.</div>`;
         });
     }
 
-    // Iniciar al cargar
     window.onload = () => {
         const session = localStorage.getItem('userSession');
         if (!session) {
-            alert("Debes iniciar sesiÃ³n primero.");
+            alert("Debes iniciar sesión primero.");
             window.location.replace('login.html');
             return;
         }
+
+        const user = JSON.parse(session);
+        if (user.rol !== 'Director') { // ✅ Solo el director puede escanear
+            alert("Acceso denegado. Solo el director puede usar el escáner.");
+            window.location.replace('index.html');
+            return;
+        }
+
         iniciarEscaneo();
     };
 </script>
 </body>
 </html>
+

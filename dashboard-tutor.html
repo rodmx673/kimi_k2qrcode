@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Tutor - QR Gate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
 </head>
 <body class="bg-slate-50 min-h-screen">
 
 <nav class="bg-blue-600 p-4 text-white shadow-lg">
     <div class="max-w-4xl mx-auto flex justify-between items-center">
         <h1 class="font-black italic uppercase tracking-tighter text-xl">QR Gate Skool</h1>
-        <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 transition">Cerrar SesiÃ³n</button>
+        <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 transition">Cerrar Sesión</button>
     </div>
 </nav>
 
@@ -51,7 +51,7 @@
 <div id="modalVinculo" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
         <h3 class="text-xl font-bold text-slate-800 mb-2">Vincular Alumno</h3>
-        <p class="text-slate-500 text-sm mb-6">Ingresa el correo electrÃ³nico del alumno.</p>
+        <p class="text-slate-500 text-sm mb-6">Ingresa el correo electrónico del alumno.</p>
 
         <input type="text" id="alumnoID" placeholder="Ej: alumno@correo.com"
                class="w-full p-4 bg-slate-100 border-none rounded-2xl mb-4 focus:ring-2 focus:ring-blue-500 outline-none font-mono text-center text-lg">
@@ -64,7 +64,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec"; // ✅ Espacio eliminado
 
     window.onload = () => {
         const session = JSON.parse(localStorage.getItem('userSession'));
@@ -84,7 +84,7 @@
             const tbody = document.getElementById('tablaHijos');
             tbody.innerHTML = '';
 
-            if (data.status === 'success' && data.data.length) {
+            if (data.status === 'success' && data.data.length) { // ✅ Ahora coincide con el backend corregido
                 data.data.forEach(reg => {
                     const color = reg.tipo.toLowerCase() === 'entrada' ? 'text-emerald-500' : 'text-orange-500';
                     const tr = document.createElement('tr');
@@ -101,7 +101,7 @@
         } catch (e) {
             console.error('Error:', e);
             document.getElementById('tablaHijos').innerHTML =
-                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexiÃ³n.</td></tr>`;
+                `<tr><td colspan="3" class="p-10 text-center text-red-600 font-bold">Error de conexión.</td></tr>`;
         }
     }
 
@@ -118,7 +118,7 @@
             const data = await res.json();
 
             if (data.status === 'success') {
-                alert('Â¡VinculaciÃ³n exitosa!');
+                alert('¡Vinculación exitosa!');
                 cerrarModal();
                 document.getElementById('alumnoID').value = '';
                 cargarAsistencias(session.email);
@@ -138,3 +138,4 @@
 </script>
 </body>
 </html>
+

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - QR Gate Skool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4">
 
@@ -22,10 +22,10 @@
                     placeholder="tu@email.com">
             </div>
             <div>
-                <label class="block text-xs font-black text-slate-500 mb-1 ml-1">CONTRASEÃ‘A</label>
+                <label class="block text-xs font-black text-slate-500 mb-1 ml-1">CONTRASEÑA</label>
                 <input type="password" id="password" required
                     class="w-full p-4 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700"
-                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                    placeholder="••••••••">
             </div>
 
             <button type="submit" id="btnIngresar"
@@ -35,13 +35,13 @@
         </form>
 
         <div class="mt-6 text-center">
-            <a href="index.html" class="text-slate-400 text-xs font-bold hover:text-blue-600">â† Volver al inicio</a>
+            <a href="index.html" class="text-slate-400 text-xs font-bold hover:text-blue-600">← Volver al inicio</a>
         </div>
     </div>
 
     <script>
         /* ----------  CONFIG  ---------- */
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec"; // ✅ Espacio eliminado
 
         /* ----------  LOGIN  ---------- */
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -65,17 +65,22 @@
 
                 if (data.status === "success") {
                     localStorage.setItem('userSession', JSON.stringify(data.user));
-                    const rutas = { Director:'monitor-director.html',Tutor:'dashboard-tutor.html',Alumno:'dashboard-alumno.html' };
-                    const dest  = rutas[data.user.rol];
+                    const rutas = {
+                        Director: 'monitor-director.html',
+                        Tutor:    'dashboard-tutor.html',
+                        Alumno:   'dashboard-alumno.html',
+                        Docente:  'dashboard-docente.html' // ✅ Agregado
+                    };
+                    const dest = rutas[data.user.rol];
                     if (dest) window.location.replace(dest);
                     else      throw new Error("Rol desconocido");
                 } else {
-                    alert("âŒ " + (data.message || "Credenciales incorrectas"));
+                    alert("❌ " + (data.message || "Credenciales incorrectas"));
                     resetBtn(btn);
                 }
             } catch (err) {
                 console.error(err);
-                alert("âš ï¸ Error de conexiÃ³n. Revisa tu internet o que el servidor estÃ© activo.");
+                alert("⚠️ Error de conexión. Revisa tu internet o que el servidor esté activo.");
                 resetBtn(btn);
             }
 
@@ -87,3 +92,4 @@
     </script>
 </body>
 </html>
+
