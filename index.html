@@ -4,61 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido - QR Gate</title>
-    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 text-center">
-
 <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-lg transform transition-all animate-in fade-in zoom-in duration-500">
     <div class="mb-2">
         <span class="text-5xl">🛡️</span>
         <h1 class="text-4xl font-black text-blue-600 italic tracking-tighter mt-2">QR GATE SKOOL</h1>
     </div>
     <p class="text-slate-500 mb-10 font-medium">Sistema Inteligente de Control Escolar</p>
-
     <div class="grid grid-cols-1 gap-4">
-        <a href="login.html"
-           class="bg-blue-600 text-white p-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-lg active:scale-95 transform">
-            INICIAR SESIÓN
-        </a>
-
-        <a href="registro.html"
-           class="bg-slate-50 text-slate-700 p-5 rounded-2xl font-bold text-lg hover:bg-slate-100 transition-all border-2 border-slate-200 active:scale-95 transform">
-            CREAR UNA CUENTA
-        </a>
+        <a href="login.html" class="bg-blue-600 text-white p-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-lg active:scale-95 transform">INICIAR SESIÓN</a>
+        <a href="registro.html" class="bg-slate-50 text-slate-700 p-5 rounded-2xl font-bold text-lg hover:bg-slate-100 transition-all border-2 border-slate-200 active:scale-95 transform">CREAR UNA CUENTA</a>
     </div>
-
     <div class="mt-10 pt-6 border-t border-slate-100">
         <p class="text-[10px] text-slate-400 uppercase tracking-widest font-black">Uso exclusivo institucional</p>
         <p class="text-[9px] text-slate-300 mt-2">V31.6 - 2026</p>
     </div>
 </div>
-
 <script>
-    /* ----------  REDIRECCIÓN SEGURA  ---------- */
     window.onload = () => {
         try {
-            const sessionData = localStorage.getItem('userSession');
-            if (!sessionData) return;
-
-            const session = JSON.parse(sessionData);
-            if (!session || !session.rol) return;
-
-            console.log('Sesión activa detectada para:', session.rol);
-
-            const rutas = {
-                Director: 'monitor-director.html',
-                Tutor:    'dashboard-tutor.html',
-                Alumno:   'dashboard-alumno.html',
-                Docente:  'dashboard-docente.html'
-            };
-            const dest = rutas[session.rol];
-            if (dest) window.location.replace(dest);
-        } catch (e) {
-            console.error('Error en redirección:', e);
-            localStorage.removeItem('userSession'); // limpiar corrupción
+            const s = JSON.parse(localStorage.getItem('userSession'));
+            if (!s?.rol) return;
+            const r = {Director:'monitor-director.html',Tutor:'dashboard-tutor.html',Alumno:'dashboard-alumno.html',Docente:'dashboard-docente.html'}[s.rol];
+            if (r) location.replace(r);
+        } catch {
+            localStorage.removeItem('userSession');
         }
     };
 </script>
 </body>
 </html>
-

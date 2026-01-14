@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escáner QR - QR Gate</title>
-    <script src="https://cdn.tailwindcss.com"></script> <!-- ✅ Espacio eliminado -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script> <!-- ✅ Espacio eliminado -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         #reader { width: 100%; max-width: 500px; margin: 0 auto; }
         .escaneando { animation: pulse 2s infinite; }
@@ -17,121 +17,66 @@
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen flex flex-col items-center justify-center p-4 text-white">
-
-<div class="text-center mb-8">
-    <h1 class="text-3xl font-black text-blue-400 italic">QR GATE SKOOL</h1>
-    <p class="text-slate-400 mt-2">Escanea la credencial para registrar acceso</p>
-</div>
-
+<div class="text-center mb-8"><h1 class="text-3xl font-black text-blue-400 italic">QR GATE SKOOL</h1><p class="text-slate-400 mt-2">Escanea la credencial para registrar acceso</p></div>
 <div id="reader" class="rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-500 escaneando"></div>
-
 <div id="resultado" class="mt-8 text-center max-w-md mx-auto hidden">
     <div id="mensaje" class="text-xl font-bold mb-4"></div>
-    <button onclick="reiniciarEscaneo()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-6 rounded-2xl transition">
-        ESCANEAR OTRO
-    </button>
+    <button onclick="reiniciarEscaneo()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-6 rounded-2xl transition">ESCANEAR OTRO</button>
 </div>
-
-<a href="index.html" class="absolute top-4 left-4 bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-full">
-    ←
-</a>
-
+<a href="index.html" class="absolute top-4 left-4 bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-full">←</a>
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec"; // ✅ Espacio eliminado
-
-    let html5QrCode = null;
-
-    function onScanSuccess(decodedText, decodedResult) {
-        if (html5QrCode) {
-            html5QrCode.stop().then(() => {
-                procesarQR(decodedText.trim());
-            }).catch(err => console.warn("Error al detener:", err));
-        }
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbUZu2l-0tFTM7LrRihEu_-oCsCwoiGeIrp0XNjy0v2ugE0fRTLEX4zQW7CxHgd-S/exec";
+let html5QrCode = null;
+function onScanSuccess(decodedText) {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => procesarQR(decodedText.trim())).catch(err => console.warn(err));
     }
-
-    function onScanFailure(error) {
-        // Silencioso
-    }
-
-    async function procesarQR(email) {
-        if (!email || !email.includes('@')) {
-            mostrarResultado("❌ Código inválido", "red");
-            return;
-        }
-
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'scan', email: email })
-            });
-
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                const color = data.tipo === 'Entrada' ? 'text-emerald-400' : 'text-orange-400';
-                const icon = data.tipo === 'Entrada' ? '✅' : '🚪';
-                mostrarResultado(
-                    `${icon} ${data.tipo.toUpperCase()}<br><span class="text-lg">${data.nombre}</span>`,
-                    data.tipo === 'Entrada' ? 'emerald' : 'orange'
-                );
-            } else {
-                mostrarResultado("❌ Error: " + (data.message || "No se pudo registrar"), "red");
-            }
-        } catch (err) {
-            console.error("Error en escaneo:", err);
-            mostrarResultado("⚠️ Error de conexión", "yellow");
-        }
-    }
-
-    function mostrarResultado(mensaje, color) {
-        const resultado = document.getElementById('resultado');
-        const mensajeDiv = document.getElementById('mensaje');
-        
-        mensajeDiv.innerHTML = mensaje;
-        mensajeDiv.className = `text-xl font-bold mb-4 text-${color}-400`;
-        resultado.classList.remove('hidden');
-    }
-
-    function reiniciarEscaneo() {
-        document.getElementById('resultado').classList.add('hidden');
-        iniciarEscaneo();
-    }
-
-    function iniciarEscaneo() {
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            config,
-            onScanSuccess,
-            onScanFailure
-        ).catch(err => {
-            console.error("No se pudo iniciar la cámara:", err);
-            document.getElementById('reader').innerHTML = 
-                `<div class="p-8 bg-slate-800 text-red-400">⚠️ No se pudo acceder a la cámara.<br>Permite el uso de la cámara e intenta de nuevo.</div>`;
+}
+async function procesarQR(email) {
+    if (!email || !email.includes('@')) return mostrarResultado("❌ Código inválido", "red");
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'scan', email: email })
         });
+        const data = await res.json();
+        if (data.status === 'success') {
+            const color = data.tipo === 'Entrada' ? 'emerald' : 'orange';
+            mostrarResultado(`${data.tipo === 'Entrada' ? '✅' : '🚪'} ${data.tipo.toUpperCase()}<br><span class="text-lg">${data.nombre}</span>`, color);
+        } else {
+            mostrarResultado("❌ Error: " + (data.message || "No se pudo registrar"), "red");
+        }
+    } catch (err) {
+        console.error(err);
+        mostrarResultado("⚠️ Error de conexión", "yellow");
     }
-
-    window.onload = () => {
-        const session = localStorage.getItem('userSession');
-        if (!session) {
-            alert("Debes iniciar sesión primero.");
-            window.location.replace('login.html');
-            return;
-        }
-
-        const user = JSON.parse(session);
-        if (user.rol !== 'Director') { // ✅ Solo el director puede escanear
-            alert("Acceso denegado. Solo el director puede usar el escáner.");
-            window.location.replace('index.html');
-            return;
-        }
-
-        iniciarEscaneo();
-    };
+}
+function mostrarResultado(mensaje, color) {
+    const div = document.getElementById('mensaje');
+    div.innerHTML = mensaje;
+    div.className = `text-xl font-bold mb-4 text-${color}-400`;
+    document.getElementById('resultado').classList.remove('hidden');
+}
+function reiniciarEscaneo() {
+    document.getElementById('resultado').classList.add('hidden');
+    iniciarEscaneo();
+}
+function iniciarEscaneo() {
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, () => {}).catch(err => {
+        document.getElementById('reader').innerHTML = `<div class="p-8 bg-slate-800 text-red-400">⚠️ No se pudo acceder a la cámara.<br>Permite el uso de la cámara e intenta de nuevo.</div>`;
+    });
+}
+window.onload = () => {
+    const s = localStorage.getItem('userSession');
+    if (!s) { alert("Debes iniciar sesión primero."); location.replace('login.html'); return; }
+    const user = JSON.parse(s);
+    if (user.rol !== 'Director') { alert("Acceso denegado. Solo el director puede usar el escáner."); location.replace('index.html'); return; }
+    iniciarEscaneo();
+};
 </script>
 </body>
 </html>
-
