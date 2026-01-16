@@ -130,13 +130,14 @@ async function testConnection() {
 function onScanSuccess(decodedText) {
     debugLog(`📷 QR escaneado: ${decodedText}`);
     
-    // NO detener el escáner, solo pausar temporalmente
     if (html5QrCode) {
-        // Pausar el escáner en lugar de detenerlo
-        html5QrCode.pause();
-        debugLog('⏸️ Escáner pausado temporalmente');
-        
-        procesarQR(decodedText.trim());
+        html5QrCode.stop().then(() => {
+            debugLog('Escáner detenido, procesando QR...');
+            procesarQR(decodedText.trim());
+        }).catch(err => {
+            debugLog(`Error deteniendo escáner: ${err}`, 'error');
+            procesarQR(decodedText.trim());
+        });
     } else {
         procesarQR(decodedText.trim());
     }
@@ -258,21 +259,9 @@ function mostrarResultado(mensaje, color) {
 }
 
 function reiniciarEscaneo() {
-    debugLog('▶️ Reanudando escáner...');
+    debugLog('🔄 Reiniciando escáner...');
     document.getElementById('resultado').classList.add('hidden');
-    
-    // Reanudar el escáner en lugar de reiniciarlo
-    if (html5QrCode) {
-        html5QrCode.resume().then(() => {
-            debugLog('✅ Escáner reanudado');
-        }).catch(err => {
-            debugLog(`❌ Error reanudando: ${err}`, 'error');
-            // Si falla al reanudar, reiniciar completamente
-            iniciarEscaneo();
-        });
-    } else {
-        iniciarEscaneo();
-    }
+    iniciarEscaneo();
 }
 
 function iniciarEscaneo() {
